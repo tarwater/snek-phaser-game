@@ -33,6 +33,9 @@
 
     var timer;
 
+    var spider;
+    var spiderExists = false;
+
     function preload() {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.scale.pageAlignHorizontally = true;
@@ -41,6 +44,7 @@
 
         game.load.image("ball", "img/ball.png");
         game.load.image("food", "img/food.png");
+        game.load.image("spider", "img/spider.png");
 
         game.load.spritesheet('bonus', 'img/bonus.png', 20, 20);
 
@@ -50,7 +54,7 @@
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        ball = game.add.sprite(0, 0, "ball");
+        ball = game.add.sprite(0, 300, "ball");
         game.physics.enable(ball, Phaser.Physics.ARCADE);
         chainGroup = game.add.physicsGroup();
         bonusGroup = game.add.physicsGroup();
@@ -77,6 +81,20 @@
             placeFood();
         }
 
+        if(!spiderExists){
+            spider = game.add.sprite(randX(), 0, "spider");
+            spiderExists = true;
+            game.physics.enable(spider, Phaser.Physics.ARCADE);
+            spider.checkWorldBounds = true;
+        } else {
+            spider.y += 2;
+            spider.events.onOutOfBounds.add(function(){
+                spiderExists = false;
+            }, this);
+
+        }
+
+        game.physics.arcade.collide(ball, spider, gameOver);
         game.physics.arcade.collide(ball, currentFood, eat);
         game.physics.arcade.collide(ball, bonusGroup, eatBonus);
 
